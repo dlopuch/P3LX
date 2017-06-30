@@ -150,7 +150,7 @@ public class UICollapsibleSection extends UI2dContainer implements UIMouseFocus 
     if (this.expanded != expanded) {
       this.expanded = expanded;
       this.content.setVisible(this.expanded);
-      setHeight(this.expanded ? this.expandedHeight : CLOSED_HEIGHT);
+      super.setHeight(this.expanded ? this.expandedHeight : CLOSED_HEIGHT);
       redraw();
     }
     return this;
