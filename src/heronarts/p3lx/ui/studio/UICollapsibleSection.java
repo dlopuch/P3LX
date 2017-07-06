@@ -69,7 +69,7 @@ public class UICollapsibleSection extends UI2dContainer implements UIMouseFocus 
     this.title.setTextAlignment(PConstants.LEFT, PConstants.TOP).setTextOffset(0,  1);
     addTopLevelComponent(this.title);
 
-    super.setHeight(this.expandedHeight = (int) Math.max(CLOSED_HEIGHT, h));
+    setHeight(this.expandedHeight = (int) Math.max(CLOSED_HEIGHT, h));
     this.content = new UI2dContainer(PADDING, CONTENT_Y, this.width - 2*PADDING, Math.max(0, this.expandedHeight - PADDING - CONTENT_Y)) {
       @Override
       public void onResize() {
@@ -87,7 +87,9 @@ public class UICollapsibleSection extends UI2dContainer implements UIMouseFocus 
     // Same sizing logic from constructor
     this.expandedHeight = (int) Math.max(CLOSED_HEIGHT, h);
     super.setHeight(h);
-    getContentTarget().setHeight(Math.max(0, this.expandedHeight - PADDING - CONTENT_Y));
+    if (getContentTarget() != null) {
+      getContentTarget().setHeight(Math.max(0, this.expandedHeight - PADDING - CONTENT_Y));
+    }
     return this;
   }
 
