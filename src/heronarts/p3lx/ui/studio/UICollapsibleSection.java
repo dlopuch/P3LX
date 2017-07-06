@@ -82,17 +82,6 @@ public class UICollapsibleSection extends UI2dContainer implements UIMouseFocus 
     setContentTarget(this.content);
   }
 
-  @Override
-  public UICollapsibleSection setHeight(float h) {
-    // Same sizing logic from constructor
-    this.expandedHeight = (int) Math.max(CLOSED_HEIGHT, h);
-    super.setHeight(h);
-    if (getContentTarget() != null) {
-      getContentTarget().setHeight(Math.max(0, this.expandedHeight - PADDING - CONTENT_Y));
-    }
-    return this;
-  }
-
   public boolean isExpanded() {
     return this.expanded;
   }
