@@ -767,7 +767,7 @@ public abstract class UI2dComponent extends UIObject {
       pg.noStroke();
       pg.fill(ui.theme.getModulationSourceMappingColor());
       pg.rect(x, y, w, h);
-    } else if (isModulationTargetMapping() || isTriggerTargetMapping()) {
+    } else if (isModulationTargetMapping() || (this.ui.triggerTargetMapping && isTriggerTargetMapping())) {
       pg.noStroke();
       pg.fill(ui.theme.getModulationTargetMappingColor());
       pg.rect(x, y, w, h);

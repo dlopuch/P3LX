@@ -28,9 +28,11 @@ package heronarts.p3lx.ui.studio.device;
 
 import heronarts.lx.LXChannel;
 import heronarts.lx.LXPattern;
+import heronarts.lx.parameter.BooleanParameter;
 import heronarts.p3lx.ui.UI;
+import heronarts.p3lx.ui.UITriggerTarget;
 
-public class UIPatternDevice extends UIDevice {
+public class UIPatternDevice extends UIDevice implements UITriggerTarget {
 
   private final static int MIN_WIDTH = 40;
 
@@ -48,4 +50,19 @@ public class UIPatternDevice extends UIDevice {
     }
   }
 
+  @Override
+  protected boolean isTriggerTargetMapping() {
+    // The pattern container is only a trigger target mapping if it's underlying pattern is
+    return (this.pattern instanceof UITriggerTarget) &&
+        ((UITriggerTarget) this.pattern).getTriggerTarget() != null;
+  }
+
+  @Override
+  public BooleanParameter getTriggerTarget() {
+    if (!(this.pattern instanceof UITriggerTarget)) {
+      return null;
+    }
+
+    return ((UITriggerTarget) this.pattern).getTriggerTarget();
+  }
 }

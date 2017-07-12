@@ -336,9 +336,9 @@ public abstract class UIObject extends UIEventHandler implements LXLoopTask {
       (this == this.ui.getTriggerSource());
   }
 
-  boolean isTriggerTargetMapping() {
+  /** @return true if this UIObject supports accepting a trigger source for trigger modulation */
+  protected boolean isTriggerTargetMapping() {
     return
-      this.ui.triggerTargetMapping &&
       (this instanceof UITriggerTarget) &&
       ((UITriggerTarget) this).getTriggerTarget() != null;
   }
@@ -463,7 +463,7 @@ public abstract class UIObject extends UIEventHandler implements LXLoopTask {
       }
       this.ui.mapModulationSource(null);
       return;
-    } else if (isTriggerTargetMapping() && !isTriggerSource()) {
+    } else if (this.ui.triggerTargetMapping && isTriggerTargetMapping() && !isTriggerSource()) {
       BooleanParameter source = this.ui.getTriggerSource().getTriggerSource();
       BooleanParameter target = ((UITriggerTarget)this).getTriggerTarget();
       if (source != null && target != null) {
