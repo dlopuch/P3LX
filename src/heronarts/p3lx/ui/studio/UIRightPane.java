@@ -68,7 +68,7 @@ import processing.core.PGraphics;
  *
  * The modulators tabs draws UIs for all global modulators added to the global {@link LXModulationEngine}
  * at lx.engine.modulation.  If you add a custom modulator, register a UI for it
- * using {@link #registerModulatorUI(UIFactory)}.
+ * using {@link #registerModulatorUI(UIFactory)} in your {@link heronarts.p3lx.LXStudio#onUIReady} implementation.
  */
 public class UIRightPane extends UIPane {
 
