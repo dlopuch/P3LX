@@ -61,6 +61,15 @@ import heronarts.p3lx.ui.studio.modulation.UIVariableLFO;
 import heronarts.p3lx.ui.studio.osc.UIOscManager;
 import processing.core.PGraphics;
 
+/**
+ * Right pane UI in LX Studio.
+ *
+ * Has two tabs: global modulators and OSC/MIDI mappings.
+ *
+ * The modulators tabs draws UIs for all global modulators added to the global {@link LXModulationEngine}
+ * at lx.engine.modulation.  If you add a custom modulator, register a UI for it
+ * using {@link #registerModulatorUI(UIFactory)}.
+ */
 public class UIRightPane extends UIPane {
 
   private final LX lx;
