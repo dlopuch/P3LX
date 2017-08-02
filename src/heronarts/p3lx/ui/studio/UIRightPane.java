@@ -35,20 +35,15 @@ import heronarts.lx.modulator.LXModulator;
 import heronarts.lx.modulator.MacroKnobs;
 import heronarts.lx.modulator.MultiStageEnvelope;
 import heronarts.lx.modulator.VariableLFO;
-import heronarts.lx.parameter.LXCompoundModulation;
 import heronarts.lx.parameter.LXParameter;
 import heronarts.lx.parameter.LXParameterListener;
 import heronarts.lx.parameter.LXTriggerModulation;
+import heronarts.lx.parameter.LXCompoundModulation;
 import heronarts.p3lx.ui.UI;
-import heronarts.p3lx.ui.UI2dComponent;
 import heronarts.p3lx.ui.UI2dContainer;
 import heronarts.p3lx.ui.UI2dScrollContext;
 import heronarts.p3lx.ui.UIObject;
 import heronarts.p3lx.ui.component.UIButton;
-import heronarts.p3lx.ui.mappings.AbstractUIFactoryRequestWithLX;
-import heronarts.p3lx.ui.mappings.ComponentToUIRegistry;
-import heronarts.p3lx.ui.mappings.UIFactory;
-import heronarts.p3lx.ui.mappings.UIFactoryRequestWithLX;
 import heronarts.p3lx.ui.studio.midi.UIMidiInputs;
 import heronarts.p3lx.ui.studio.midi.UIMidiMappings;
 import heronarts.p3lx.ui.studio.midi.UIMidiSurfaces;
@@ -61,15 +56,6 @@ import heronarts.p3lx.ui.studio.modulation.UIVariableLFO;
 import heronarts.p3lx.ui.studio.osc.UIOscManager;
 import processing.core.PGraphics;
 
-/**
- * Right pane UI in LX Studio.
- *
- * Has two tabs: global modulators and OSC/MIDI mappings.
- *
- * The modulators tabs draws UIs for all global modulators added to the global {@link LXModulationEngine}
- * at lx.engine.modulation.  If you add a custom modulator, register a UI for it
- * using {@link #registerModulatorUI(UIFactory)} in your {@link heronarts.p3lx.LXStudio#onUIReady} implementation.
- */
 public class UIRightPane extends UIPane {
 
   private final LX lx;
@@ -86,8 +72,6 @@ public class UIRightPane extends UIPane {
   private int envCount = 1;
   private int beatCount = 1;
   private int macroCount = 1;
-
-  private ComponentToUIRegistry<LXModulator, UIFactoryRequestWithLX, UI2dComponent> modulatorUIRegistry;
 
   public UIRightPane(UI ui, final LX lx) {
     super(ui, lx, new String[] { "MODULATION", "OSC + MIDI" }, ui.getWidth() - WIDTH, WIDTH);
@@ -213,90 +197,6 @@ public class UIRightPane extends UIPane {
       }
     });
 
-
-    // Build modulator UI registry with default component --> UI mappings
-    final UI2dScrollContext modulationContext = this.modulation;
-    UIFactoryRequestWithLX commonRequest = new AbstractUIFactoryRequestWithLX(lx, ui) {
-      @Override
-      public float getX() {
-        return 0; // modulator UI2dComponents always have x=0
-      }
-
-      @Override
-      public float getY() {
-        return 0; // modulator UI2dComponents always have y=0
-      }
-
-      @Override
-      public float getWidth() {
-        return modulationContext.getContentWidth();
-      }
-    };
-
-    modulatorUIRegistry = new ComponentToUIRegistry<>(commonRequest);
-
-    modulatorUIRegistry
-        // VariableLFO --> UIVariableLFO
-        .registerFactory(new UIFactory<LXModulator, UIFactoryRequestWithLX, UI2dComponent>() {
-          @Override
-          public boolean canBuildUIFor(LXModulator forObject) {
-            return forObject instanceof VariableLFO;
-          }
-
-          @Override
-          public UI2dComponent buildUI(UIFactoryRequestWithLX req, LXModulator forObject) {
-            return new UIVariableLFO(req.getUI(), req.getLX(), (VariableLFO) forObject,
-                req.getX(), req.getY(), req.getWidth()
-            );
-          }
-        })
-
-        // MultiStageEnvelope --> UIMultiStageEnvelope
-        .registerFactory(new UIFactory<LXModulator, UIFactoryRequestWithLX, UI2dComponent>() {
-          @Override
-          public boolean canBuildUIFor(LXModulator forObject) {
-            return forObject instanceof MultiStageEnvelope;
-          }
-
-          @Override
-          public UI2dComponent buildUI(UIFactoryRequestWithLX req, LXModulator forObject) {
-            return new UIMultiStageEnvelope(req.getUI(), req.getLX(), (MultiStageEnvelope) forObject,
-                req.getX(), req.getY(), req.getWidth()
-            );
-          }
-        })
-
-        // BandGate --> UIBandGate
-        .registerFactory(new UIFactory<LXModulator, UIFactoryRequestWithLX, UI2dComponent>() {
-          @Override
-          public boolean canBuildUIFor(LXModulator forObject) {
-            return forObject instanceof BandGate;
-          }
-
-          @Override
-          public UI2dComponent buildUI(UIFactoryRequestWithLX req, LXModulator forObject) {
-            return new UIBandGate(req.getUI(), req.getLX(), (BandGate) forObject,
-                req.getX(), req.getY(), req.getWidth()
-            );
-          }
-        })
-
-        // MacroKnobs --> UIMacroKnobs
-        .registerFactory(new UIFactory<LXModulator, UIFactoryRequestWithLX, UI2dComponent>() {
-          @Override
-          public boolean canBuildUIFor(LXModulator forObject) {
-            return forObject instanceof MacroKnobs;
-          }
-
-          @Override
-          public UI2dComponent buildUI(UIFactoryRequestWithLX req, LXModulator forObject) {
-            return new UIMacroKnobs(req.getUI(), req.getLX(), (MacroKnobs) forObject,
-                req.getX(), req.getY(), req.getWidth()
-            );
-          }
-        });
-
-
     for (LXModulator modulator : lx.engine.modulation.getModulators()) {
       addModulator(modulator);
     }
@@ -326,22 +226,6 @@ public class UIRightPane extends UIPane {
     });
   }
 
-  /**
-   * Adds a mapping to build a custom modulator UI.
-   *
-   * If you add custom modulators to the lx.engine.modulation {@link LXModulationEngine}, you need to define a UI
-   * mapping for them using this method.
-   *
-   * @param modulatorUIFactory Factory that can create your modulation
-   * @return this pane, for chaining
-   */
-  public UIRightPane registerModulatorUI(
-      UIFactory<LXModulator, UIFactoryRequestWithLX, UI2dComponent> modulatorUIFactory
-  ) {
-    this.modulatorUIRegistry.registerFactory(modulatorUIFactory);
-    return this;
-  }
-
   private UIModulator findModulator(LXParameter parameter) {
     for (UIObject child : this.modulation) {
       if (child instanceof UIModulator) {
@@ -355,8 +239,17 @@ public class UIRightPane extends UIPane {
   }
 
   private void addModulator(LXModulator modulator) {
-    modulatorUIRegistry.getComponent(modulator)
-        .addToContainer(this.modulation, 1);
+    if (modulator instanceof VariableLFO) {
+      new UIVariableLFO(this.ui, this.lx, (VariableLFO) modulator, 0, 0, this.modulation.getContentWidth()).addToContainer(this.modulation, 1);
+    } else if (modulator instanceof MultiStageEnvelope) {
+      new UIMultiStageEnvelope(this.ui, this.lx, (MultiStageEnvelope) modulator, 0, 0, this.modulation.getContentWidth()).addToContainer(this.modulation, 1);
+    } else if (modulator instanceof BandGate) {
+      new UIBandGate(this.ui, this.lx, (BandGate) modulator, 0, 0, this.modulation.getContentWidth()).addToContainer(this.modulation, 1);
+    } else if (modulator instanceof MacroKnobs) {
+      new UIMacroKnobs(this.ui, this.lx, (MacroKnobs) modulator, 0, 0, this.modulation.getContentWidth()).addToContainer(this.modulation, 1);
+    } else {
+      System.err.println("No UI available for modulator type: " + modulator.getClass().getName());
+    }
   }
 
   private void removeModulator(LXModulator modulator) {
