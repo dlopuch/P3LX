@@ -94,9 +94,6 @@ public class UIRightPane extends UIPane {
     registerModulatorUI(MultiStageEnvelope.class, UIMultiStageEnvelope.class);
     registerModulatorUI(BandGate.class, UIBandGate.class);
     registerModulatorUI(MacroKnobs.class, UIMacroKnobs.class);
-
-    buildMidiUI();
-    buildModulationUI();
   }
 
   public <T extends LXModulator> void registerModulatorUI(Class<T> modulatorClass, Class<? extends UIModulator> uiClass) {
@@ -108,6 +105,12 @@ public class UIRightPane extends UIPane {
       this.modulatorClasses.addFirst(modulatorClass);
     }
     this.modulatorUIRegistry.put(modulatorClass, uiFactory);
+  }
+
+  /** {@link heronarts.p3lx.LXStudio.UI} lifecycle hook that creates all the UI elements */
+  public void buildUI() {
+    buildMidiUI();
+    buildModulationUI();
   }
 
   private void buildMidiUI() {
