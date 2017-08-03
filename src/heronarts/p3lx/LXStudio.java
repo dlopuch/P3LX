@@ -92,14 +92,17 @@ public class LXStudio extends P3LX {
       super(lx);
       setBackgroundColor(this.theme.getDarkBackgroundColor());
 
+      // Construct instances that might need initialization
+      this.rightPane = new UIRightPane(this, lx);
+
+      // let user configure all elements, eg UIRightPane#registerModulatorUI
+      initialize(lx, this);
+
       this.preview = new PreviewWindow(this, lx, UILeftPane.WIDTH, 0, this.applet.width - UILeftPane.WIDTH - UIRightPane.WIDTH, this.applet.height - UIBottomTray.HEIGHT - UIContextualHelpBar.VISIBLE_HEIGHT);
       this.leftPane = new UILeftPane(this, lx);
-      this.rightPane = new UIRightPane(this, lx);
+      this.rightPane.buildUI();
       this.bottomTray = new UIBottomTray(this, lx);
       this.helpBar = new UIContextualHelpBar(this);
-
-      initialize(lx, this); // let user configure all elements, eg UIRightPane#registerModulatorUI
-      this.rightPane.buildUI();
 
       addLayer(this.preview);
       addLayer(this.leftPane);
