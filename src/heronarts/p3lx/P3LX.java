@@ -27,6 +27,7 @@
 package heronarts.p3lx;
 
 import heronarts.lx.LX;
+import heronarts.lx.LXChannel;
 import heronarts.lx.LXEffect;
 import heronarts.lx.LXPattern;
 import heronarts.lx.ModelBuffer;
@@ -248,21 +249,22 @@ public class P3LX extends LX {
   }
 
   @Override
-  protected LXPattern instantiatePattern(String className) throws CouldNotInstantiatePatternException {
+  protected <T extends LXPattern> T instantiatePattern(Class<T> clazz, String patternLabel, LXChannel patternChannel)
+    throws CouldNotInstantiatePatternException
+  {
     // Try LX constructor and pattern factory registry
     try {
-      return super.instantiatePattern(className);
+      return super.instantiatePattern(clazz, patternLabel, patternChannel);
     } catch (CouldNotInstantiatePatternException e) {
       // Try next approach
     }
 
     // Try using the (PApplet, P3LX) constructor
     try {
-      Class<? extends LXPattern> cls = Class.forName(className).asSubclass(LXPattern.class);
-      return cls.getConstructor(applet.getClass(), LX.class).newInstance(applet, this);
+      return clazz.getConstructor(applet.getClass(), LX.class).newInstance(applet, this);
 
     } catch (Exception x2) {
-      throw new CouldNotInstantiatePatternException("Pattern instantiation failed: " + x2.getLocalizedMessage());
+      throw new CouldNotInstantiatePatternException("Pattern instantiation failed: " + x2.getLocalizedMessage(), x2);
     }
   }
 
