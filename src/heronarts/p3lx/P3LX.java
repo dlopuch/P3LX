@@ -26,20 +26,20 @@
 
 package heronarts.p3lx;
 
-import heronarts.p3lx.ui.UI;
-
-import java.lang.reflect.Modifier;
-
 import heronarts.lx.LX;
+import heronarts.lx.LXChannel;
 import heronarts.lx.LXEffect;
 import heronarts.lx.LXPattern;
 import heronarts.lx.ModelBuffer;
 import heronarts.lx.model.GridModel;
 import heronarts.lx.model.LXModel;
 import heronarts.lx.model.StripModel;
+import heronarts.p3lx.ui.UI;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
+
+import java.lang.reflect.Modifier;
 
 /**
  * Harness to run LX inside a Processing 2 sketch
@@ -110,7 +110,9 @@ public class P3LX extends LX {
     super(model);
     this.applet = applet;
 
-    this.engine.script.setScriptPath(applet.sketchPath());
+    String sketchPath = applet.sketchPath();
+    this.engine.script.setScriptPath(sketchPath);
+    this.engine.audio.output.setMediaPath(sketchPath);
 
     for (Class<?> cls : applet.getClass().getDeclaredClasses()) {
       if (!Modifier.isAbstract(cls.getModifiers())) {
@@ -189,6 +191,10 @@ public class P3LX extends LX {
 
     long engineStart = System.nanoTime();
     String frameRateStr = "";
+
+    // Give the engine a chance to sort itself out each frame
+    this.engine.onDraw();
+
     if (this.engine.isThreaded()) {
       // NOTE: because we don't hold a lock, it is *possible* that the
       // engine stops being in threading mode just between these lines,
@@ -243,23 +249,22 @@ public class P3LX extends LX {
   }
 
   @Override
-  protected LXPattern instantiatePattern(String className) {
-    Class<? extends LXPattern> cls;
+  protected <T extends LXPattern> T instantiatePattern(Class<T> clazz, String patternLabel, LXChannel patternChannel)
+    throws CouldNotInstantiatePatternException
+  {
+    // Try LX constructor and pattern factory registry
     try {
-      cls = Class.forName(className).asSubclass(LXPattern.class);
-    } catch (ClassNotFoundException cnfx) {
-      System.err.println("No pattern class found for " + className + ": " + cnfx.getLocalizedMessage());
-      return null;
+      return super.instantiatePattern(clazz, patternLabel, patternChannel);
+    } catch (CouldNotInstantiatePatternException e) {
+      // Try next approach
     }
+
+    // Try using the (PApplet, P3LX) constructor
     try {
-      return cls.getConstructor(LX.class).newInstance(this);
-    } catch (Exception x) {
-      try {
-        return cls.getConstructor(applet.getClass(), LX.class).newInstance(applet, this);
-      } catch (Exception x2) {
-        System.err.println("Pattern instantiation failed: " + x2.getLocalizedMessage());
-        return null;
-      }
+      return clazz.getConstructor(applet.getClass(), LX.class).newInstance(applet, this);
+
+    } catch (Exception x2) {
+      throw new CouldNotInstantiatePatternException("Pattern instantiation failed: " + x2.getLocalizedMessage(), x2);
     }
   }
 

@@ -26,11 +26,6 @@
 
 package heronarts.p3lx.ui;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 import heronarts.lx.audio.BandGate;
 import heronarts.lx.modulator.LXModulator;
 import heronarts.lx.modulator.MacroKnobs;
@@ -41,6 +36,11 @@ import heronarts.p3lx.ui.studio.modulation.UIMacroKnobs;
 import heronarts.p3lx.ui.studio.modulation.UIModulator;
 import heronarts.p3lx.ui.studio.modulation.UIMultiStageEnvelope;
 import heronarts.p3lx.ui.studio.modulation.UIVariableLFO;
+
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class UIRegistry {
 
@@ -75,6 +75,7 @@ public class UIRegistry {
       for (Class<? extends LXModulator> clazz : this.modulatorClasses) {
         if (clazz.isInstance(modulator)) {
           uiFactory = this.modulatorUIRegistry.get(clazz);
+          break; // stop on first result (latest registered match)
         }
       }
     }
