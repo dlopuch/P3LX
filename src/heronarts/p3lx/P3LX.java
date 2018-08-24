@@ -249,7 +249,7 @@ public class P3LX extends LX {
   }
 
   @Override
-  protected <T extends LXPattern> T instantiatePattern(Class<T> clazz, String patternLabel, LXChannel patternChannel)
+  public <T extends LXPattern> T instantiatePattern(Class<T> clazz, String patternLabel, LXChannel patternChannel)
     throws CouldNotInstantiatePatternException
   {
     // Try LX constructor and pattern factory registry

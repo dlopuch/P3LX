@@ -79,13 +79,22 @@ public class UIPatternManager extends UIComponentManager {
       LXPattern instance = null;
       try {
         try {
+          // Try instantiating with default LX constructor
           instance = pattern.getConstructor(LX.class).newInstance(lx);
         } catch (NoSuchMethodException nsmx) {
           try {
             PApplet applet = ((P3LX)lx).applet;
+
+            // Try instantiating via default PApplet + LX constructor
             instance = pattern.getConstructor(applet.getClass(), LX.class).newInstance(applet, lx);
           } catch (NoSuchMethodException nsmx2) {
-            nsmx2.printStackTrace();
+
+            // Try instantiating via registered factories
+            try {
+              instance = lx.instantiatePattern(pattern, null, (LXChannel) lx.engine.getFocusedChannel());
+            } catch (LX.CouldNotInstantiatePatternException e) {
+              e.printStackTrace();
+            }
           }
         }
       } catch (java.lang.reflect.InvocationTargetException itx) {
